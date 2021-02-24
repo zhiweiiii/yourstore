@@ -1,6 +1,11 @@
 package com.wade.yourstore.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wade.yourstore.service.impl.NoteServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -22,6 +27,9 @@ import java.util.Scanner;
 @RequestMapping("/api/yourstore/note")
 public class NoteController {
 
+    @Autowired
+    NoteServiceImpl noteService;
+
     @PostMapping()
     public void test(){
         Scanner s= new Scanner(System.in);//定义一输入s
@@ -32,5 +40,10 @@ public class NoteController {
             System.out.println("输出的结果为：" +str);}
         System.out.println("结束");
         s.close();
+    }
+
+    @PostMapping("/getAll")
+    public Page getAllNotePage(Page page){
+        return noteService.getBaseMapper().selectPage(page,new QueryWrapper<>());
     }
 }

@@ -75,7 +75,7 @@ public class RegisterKey implements ServletContextAware {
     @Override
     public void setServletContext(ServletContext servletContext) {
         registerKey();
-        listenerJavaInput();
+//        listenerJavaInput();
     }
 
     public void listenerJavaInput() throws IOException {
