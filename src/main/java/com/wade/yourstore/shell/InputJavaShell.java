@@ -12,26 +12,28 @@ public class InputJavaShell {
 
 
 
-        public static void main(String[] args) {
+        public static void main(String[] args) throws IOException {
+            OutputStream os = null;
+            DataOutputStream dos = null;
             try {
-                Socket s = new Socket("127.0.0.1", 9555);
-                OutputStream os = s.getOutputStream();
-                DataOutputStream dos = new DataOutputStream(os);
+
+
                 //使用Scanner读取控制台的输入，并发送到服务端
 
                 Scanner sc = new Scanner(System.in);
 
+                Socket s = new Socket("127.0.0.1", 9555);
+                os = s.getOutputStream();
+                dos = new DataOutputStream(os);
                 String str = sc.nextLine();
                 dos.writeUTF(str);
 
+            } catch (Exception e) {
+
+                e.printStackTrace();
+            }finally {
                 dos.close();
-                s.close();
-            } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                os.close();
             }
         }
     }

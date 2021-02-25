@@ -10,6 +10,7 @@ import com.wade.yourstore.service.impl.KeyInfoServiceImpl;
 import com.wade.yourstore.service.impl.NoteServiceImpl;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.ServletContextAware;
 
@@ -35,7 +36,7 @@ public class RegisterKey implements ServletContextAware {
     @Autowired
     KeyInfoServiceImpl keyInfoService;
     @Autowired
-    NoteServiceImpl noteService;
+    JavaSocketConnect javaSocketConnect;
 
 
     private void registerKey(){
@@ -71,38 +72,12 @@ public class RegisterKey implements ServletContextAware {
         });
     }
 
-    @SneakyThrows
+
     @Override
     public void setServletContext(ServletContext servletContext) {
         registerKey();
-//        listenerJavaInput();
+        javaSocketConnect.listenerJavaInput();
     }
 
-    public void listenerJavaInput() throws IOException {
-        ServerSocket server = new ServerSocket(9555);
-        while (true){
-            //等待请求
-            Socket socket = server.accept();
-            BufferedReader is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String allLine="";
-            String line;
-            boolean first=true;
-            while ((line=is.readLine())!=null) {
-                if (first)
-                    line=line.substring(2).trim();
-                allLine+=" "+line;
-            }
-            Note note=new Note();
-            note.setContent(allLine);
-            note.setTime(LocalDateTime.now());
-            note.setFormat("cmd");
-            noteService.getBaseMapper().insert(note);
-            System.out.println("received frome client:" + line);
-            //创建PrintWriter，用于发送数据
-            PrintWriter pw = new PrintWriter(socket.getOutputStream());
-            pw.println("this data is from server");
-            pw.flush();
-        }
 
-    }
 }

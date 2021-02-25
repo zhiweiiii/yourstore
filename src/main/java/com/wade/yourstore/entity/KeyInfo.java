@@ -18,6 +18,8 @@ public class KeyInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Long id;
+
     private Integer prefixKey;
 
     private Integer keyWord;

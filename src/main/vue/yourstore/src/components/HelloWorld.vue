@@ -1,27 +1,37 @@
 <template>
-  <el-table :data="queryInfo.records" style="width: 100%">
-    <el-table-column prop="time" label="时间" width="180">
-      
-    </el-table-column>
-    <el-table-column prop="content" label="内容"> </el-table-column>
-  </el-table>
-  <div class="block">
-    <el-pagination
-      layout="prev, pager, next"
-      @current-change="currentChange()"
-      :page-size="queryInfo.size"
-      :current-page="queryInfo.current"
-      :total="queryInfo.total"
-    >
-    </el-pagination>
-  </div>
+  <el-row>
+    <el-col :span="12">
+      <el-table :data="queryInfo.records" style="width: 100%" @row-click="listClick">
+        <el-table-column prop="time" label="时间" width="180">
 
-  <div class="hello">
-    <!-- <div id="editor"> -->
-    <!-- <textarea :value="input" @input="update"></textarea> -->
-    <!-- <div v-html="compiledMarkdown"></div> -->
-    <!-- </div> -->
-  </div>
+        </el-table-column>
+        <el-table-column prop="content" label="内容"></el-table-column>
+        <el-table-column> → </el-table-column>
+      </el-table>
+      <div class="block">
+        <el-pagination
+            layout="prev, pager, next"
+            @current-change="currentChange"
+            :page-size="queryInfo.size"
+            :current-page="queryInfo.current"
+            :total="queryInfo.total"
+        >
+        </el-pagination>
+      </div>
+    </el-col>
+    <el-col :span="12">
+      <div class="hello">
+        <div id="editor">
+<!--          <textarea :value="input" @input="update"></textarea>-->
+          <div v-html="compiledMarkdown"></div>
+        </div>
+      </div>
+    </el-col>
+  </el-row>
+
+
+
+
 </template>
 
 <script>
@@ -37,19 +47,20 @@ export default {
 
   data() {
     return {
-      
+      input: "123",
       queryInfo: {
         size: 10,
         current: 1,
         total:10,
         records:[]
       },
+      chooseDate:{content :"# 加载中"}
     };
   },
 
   computed: {
     compiledMarkdown() {
-      return marked(this.input, { sanitize: true });
+      return marked(this.chooseDate.content, { sanitize: true });
     },
   },
 
@@ -64,12 +75,18 @@ export default {
         data: this.queryInfo,
       }).then((response) => {
         this.queryInfo = response.data;
+        this.chooseDate=this.queryInfo.records[0];
       });
     },
-    currentChange() {
-      console.log(this.queryInfo);
+    currentChange(val) {
+      this.queryInfo.current = val;
       this.getData();
+
     },
+    listClick(val){
+      this.chooseDate=val;
+      console.log("422",this.chooseDate)
+    }
   },
 };
 </script>

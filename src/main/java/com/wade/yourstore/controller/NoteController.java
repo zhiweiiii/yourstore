@@ -4,9 +4,11 @@ package com.wade.yourstore.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wade.yourstore.entity.Note;
 import com.wade.yourstore.service.impl.NoteServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.stereotype.Controller;
@@ -43,7 +45,7 @@ public class NoteController {
     }
 
     @PostMapping("/getAll")
-    public Page getAllNotePage(Page page){
-        return noteService.getBaseMapper().selectPage(page,new QueryWrapper<>());
+    public Page getAllNotePage(@RequestBody Page page){
+        return noteService.getBaseMapper().selectPage(page,new QueryWrapper<Note>().orderByDesc("time"));
     }
 }
