@@ -20,11 +20,10 @@ public class MyKeyListener implements NativeKeyListener {
 
     @Override
     public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
-        System.out.println(nativeKeyEvent.getKeyCode());
         //按下前
         keyInfoList.forEach(keyInfo -> {
             if (keyInfo.getIsUsing()){
-                if ((nativeKeyEvent.getModifiers() & keyInfo.getPrefixKey()) >0 && (nativeKeyEvent.getKeyCode()==keyInfo.getKeyWord())){
+                if ((keyInfo.getPrefixKey()==nativeKeyEvent.getModifiers()) && (nativeKeyEvent.getKeyCode()==keyInfo.getKeyWord())){
                     if (StringUtils.isBlank(keyInfo.getContent())){
                         keyInfo.setContent("C:/Windows/System32/cmd.exe /k start cmd");
                     }

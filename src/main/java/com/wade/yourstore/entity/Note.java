@@ -2,6 +2,9 @@ package com.wade.yourstore.entity;
 
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,7 +21,7 @@ import lombok.EqualsAndHashCode;
 public class Note implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     private String title;

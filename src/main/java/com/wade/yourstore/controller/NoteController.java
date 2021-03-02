@@ -48,4 +48,16 @@ public class NoteController {
     public Page getAllNotePage(@RequestBody Page page){
         return noteService.getBaseMapper().selectPage(page,new QueryWrapper<Note>().orderByDesc("time"));
     }
+
+    @PostMapping("update")
+    public Note update(@RequestBody Note note){
+        noteService.updateById(note);
+        return note;
+    }
+    @PostMapping("delete")
+    public Note delete(@RequestBody Note note){
+        noteService.removeById(note.getId());
+        return note;
+
+    }
 }

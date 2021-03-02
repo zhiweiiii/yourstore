@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -25,30 +26,34 @@ public class JavaSocketConnect {
             ServerSocket server = new ServerSocket(9555);
             while (true) {
                 //等待请求
-                Socket socket = server.accept();
-                BufferedReader is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                String allLine = "";
-                String line;
-                boolean first = true;
-                while ((line = is.readLine()) != null) {
-                    if (first)
-                        line = line.substring(2).trim();
-                    allLine += " " + line;
+                try {
+                    Socket socket = server.accept();
+                    BufferedReader is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    String allLine = "";
+                    String line;
+                    boolean first = true;
+                    while ((line = is.readLine()) != null) {
+                        if (first)
+                            line = line.substring(2).trim();
+                        allLine += " " + line;
+                    }
+                    Note note = new Note();
+                    note.setContent(allLine);
+                    note.setTime(LocalDateTime.now());
+                    note.setFormat("cmd");
+                    noteService.getBaseMapper().insert(note);
+                    System.out.println("received frome client:" + line);
+                    //创建PrintWriter，用于发送数据
+                    PrintWriter pw = new PrintWriter(socket.getOutputStream());
+                    pw.println("this data is from server");
+                    pw.flush();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                Note note = new Note();
-                note.setContent(allLine);
-                note.setTime(LocalDateTime.now());
-                note.setFormat("cmd");
-                noteService.getBaseMapper().insert(note);
-                System.out.println("received frome client:" + line);
-                //创建PrintWriter，用于发送数据
-                PrintWriter pw = new PrintWriter(socket.getOutputStream());
-                pw.println("this data is from server");
-                pw.flush();
             }
-        }catch (Exception e){
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }
