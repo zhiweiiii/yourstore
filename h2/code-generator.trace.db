@@ -1,0 +1,9 @@
+2021-03-08 18:14:36 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "KEY_INFO" not found; SQL statement:
+SELECT  id,prefix_key,key_word,content,is_using,flag  FROM key_info [42102-199]
+2021-03-08 18:26:07 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "KEY_INFO" already exists; SQL statement:
+create table `key_info` ( `id` bigint(20) primary key not null, `prefix_key` int(8) null default null, `key_word` int(16) null default null, `content` text , `is_using` tinyint(1) null default null, `flag` int(8) null default null, ) [42101-199]
+2021-03-08 18:26:37 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "KEY_INFO" already exists; SQL statement:
+create table `key_info` ( `id` bigint(20) primary key not null, `prefix_key` int(8) null default null, `key_word` int(16) null default null, `content` text , `is_using` tinyint(1) null default null, `flag` int(8) null default null, ) [42101-199]
