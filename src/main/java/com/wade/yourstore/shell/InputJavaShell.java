@@ -21,11 +21,19 @@ public class InputJavaShell {
                 //使用Scanner读取控制台的输入，并发送到服务端
 
                 Scanner sc = new Scanner(System.in);
+                String str="";
+                while(sc.hasNextLine()){
+                    String next=sc.nextLine();
+                    if (next.equals("")){
+                        break;
+                    }
+                    str =str+ next+"\n";
+                }
 
                 Socket s = new Socket("127.0.0.1", 9555);
                 os = s.getOutputStream();
                 dos = new DataOutputStream(os);
-                String str = sc.nextLine();
+
                 dos.writeUTF(str);
 
             } catch (Exception e) {

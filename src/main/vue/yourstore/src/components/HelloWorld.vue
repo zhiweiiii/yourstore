@@ -1,29 +1,47 @@
 <template>
   <div id="HelloWorld">
 
+    <div style="text-align: left;font-size: 30px;padding-left: 60px">HelloTime
+      <el-button plain :loading="loadSave" @click="createData" style="margin-right: 20px">我想到了</el-button>
+
+      <el-input ref="search" v-show="showSearch" style="display: inline-block;width: 20%;" v-model="queryInfo.searchData" autofocus="true"  placeholder="想找"></el-input>
+
+        <el-button plain :loading="loadSave" @click="createSearch">我想找</el-button></div>
 
   <el-row>
     <el-col :span="12">
-      <el-drawer v-model="showEdit" direction="ltr" size="50%" :with-header="false" :modal="false">
-        <div align="right" style=" margin:10px 20px 30px">
-          <el-button plain @click="updateData">保存</el-button>
-          <el-button plain @click="closeEdit">返回</el-button>
-        </div>
-        <v-md-editor text="32" v-model="chooseDate.content" height="100%" width="100%" mode="edit">343</v-md-editor>
+      <el-drawer v-model="showEdit" direction="ltr" size="50%" :with-header="false" :modal="false" destroy-on-close>
+
+        <el-row :gutter="20" >
+
+        <el-col :span="16">
+          <el-input size="20%" v-model="chooseDate.title" placeholder="请输入标题"></el-input>
+        </el-col>
+          <el-col :span="1"></el-col>
+          <el-col :span="7" style="float:right" >
+            <el-button plain :loading="loadSave" @click="updateData">保存</el-button>
+            <el-button plain :loading="loadSave" @click="closeEdit">返回</el-button>
+          </el-col>
+        </el-row>
+        <v-md-editor text="32" v-model="chooseDate.content" height="100%" width="100%" mode="edit"></v-md-editor>
       </el-drawer>
       <el-collapse-transition>
-      <el-table :data="queryInfo.records" style="width: 100%" @row-click="listClick">
-        <el-table-column prop="time" label="时间" width="180">
+      <el-table :data="tableData" style="width: 100%" @row-click="listClick">
 
+        <el-table-column prop="time" label="记录头" width="180">
+          <template #default="scope">
+          {{ dateFormat(scope.row.time)}}<br>{{scope.row.title}}
+        </template>
         </el-table-column>
         <el-table-column prop="content" label="内容"></el-table-column>
 
         <el-table-column>
           <template #default="scope">
           <el-button plain @click="openEdit(scope.row)">编辑</el-button>
-          <el-button plain @click="deleteData(scope.$index,scope.row,queryInfo.records)">删除</el-button>
+          <el-button plain @click="deleteData(scope.$index,scope.row,tableData)">删除</el-button>
           </template>
         </el-table-column>
+
 
       </el-table>
       </el-collapse-transition>
@@ -53,6 +71,7 @@
 </template>
 
 <script>
+import '@kangc/v-md-editor/lib/style/preview.css';
 export default {
   name: "HelloWorld",
   components:{
@@ -62,19 +81,38 @@ export default {
   created() {
     this.getData();
   },
+  computed: {
+    dateFormat() {
+      return function(originVal){
+        const dt = new Date(originVal)
+        const y = dt.getFullYear()
+        // 月份从0开始,使她变成字符串,不足两位时,前面补个0.
+        const m = (dt.getMonth() + 1 + '').padStart(2, '0')
+        const d = (dt.getDate() + '').padStart(2, '0')
+        const hh = (dt.getHours() + '').padStart(2, '0')
+        const mm = (dt.getMinutes() + '').padStart(2, '0')
+        const ss = (dt.getSeconds() + '').padStart(2, '0')
+        return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
+      }
+    }
+
+  },
 
   data() {
     return {
-      atest: "433",
+      loadSave:false,
       showEdit: false,
       input: "123",
       queryInfo: {
         size: 10,
         current: 1,
         total:10,
-        records:[]
+        searchData:""
       },
-      chooseDate:{content:"# 加载中"}
+      tableData:[],
+      chooseDate:{content:"# 加载中"},
+      showSearch:false
+
     };
   },
 
@@ -85,10 +123,12 @@ export default {
         url: "yourstore/note/getAll",
         data: this.queryInfo,
       }).then((response) => {
-        this.queryInfo = response.data;
-        this.chooseDate=this.queryInfo.records[0];
+        this.tableData = response.data.records;
+        this.queryInfo.total=response.data.total;
+        this.chooseDate=this.tableData[0];
       });
     },updateData(){
+      this.loadSave=true;
       this.$http({
         method: "post",
         url: "yourstore/note/update",
@@ -105,7 +145,7 @@ export default {
         if (data.status==200){
           tableData.splice(index, 1);
           // this.getData();
-          this.chooseDate=this.queryInfo.records[0];
+          this.chooseDate=this.tableData[0];
         }
       });
     },
@@ -114,13 +154,26 @@ export default {
       this.getData();
     },
     listClick(val){
+      console.log("2",val)
       this.chooseDate=val;
+    },
+    createData(){
+      this.chooseDate={};
+      this.openEdit();
     },
     openEdit(){
       this.showEdit=true;
     },
     closeEdit(){
+      this.loadSave=false;
       this.showEdit=false;
+    },createSearch(){
+      if (!this.showSearch) {
+        this.showSearch = true;
+        this.$refs['search'].focus()
+      }else{
+        this.getData();
+      }
     }
   },
 };
@@ -128,51 +181,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-html,
-body,
-#editor {
-  margin: 0;
-  height: 100%;
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  color: #333;
-}
 
-textarea{
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  vertical-align: top;
-  box-sizing: border-box;
-  padding: 0 20px;
-  background: #2c3e50;
-}
 
-textarea {
-  border: none;
-  border-right: 1px solid #ccc;
-  resize: none;
-  outline: none;
-  background-color: #f6f6f6;
-  font-size: 14px;
-  font-family: "Monaco", courier, monospace;
-  padding: 20px;
-}
-
-code {
-  color: #f66;
-}
 </style>

@@ -6,8 +6,9 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import java.awt.event.KeyEvent;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
+import java.util.Scanner;
 
 public class MyKeyListener implements NativeKeyListener {
 
@@ -25,10 +26,10 @@ public class MyKeyListener implements NativeKeyListener {
             if (keyInfo.getIsUsing()){
                 if ((keyInfo.getPrefixKey()==nativeKeyEvent.getModifiers()) && (nativeKeyEvent.getKeyCode()==keyInfo.getKeyWord())){
                     if (StringUtils.isBlank(keyInfo.getContent())){
-                        keyInfo.setContent("C:/Windows/System32/cmd.exe /k start cmd");
+                        keyInfo.setContent("cmd /c start cmd");
                     }
                     try {
-                        Runtime.getRuntime().exec(keyInfo.getContent());
+                        Process p=Runtime.getRuntime().exec("cmd /c start run.bat");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

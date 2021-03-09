@@ -4,16 +4,17 @@ package com.wade.yourstore.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wade.yourstore.dto.SearchDTO;
 import com.wade.yourstore.entity.Note;
 import com.wade.yourstore.service.impl.NoteServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 /**
@@ -27,31 +28,36 @@ import java.util.Scanner;
 @ResponseBody
 @Controller
 @RequestMapping("/api/yourstore/note")
+@Slf4j
 public class NoteController {
 
     @Autowired
     NoteServiceImpl noteService;
 
-    @PostMapping()
-    public void test(){
-        Scanner s= new Scanner(System.in);//定义一输入s
-        System.out.println("输入：");
-//判断是否有输入的值，nextLine为接收字符串，next()为接收单词遇到空格就停止
-        if(s.hasNextLine()){
-            String str= s.nextLine();
-            System.out.println("输出的结果为：" +str);}
-        System.out.println("结束");
-        s.close();
-    }
-
     @PostMapping("/getAll")
-    public Page getAllNotePage(@RequestBody Page page){
-        return noteService.getBaseMapper().selectPage(page,new QueryWrapper<Note>().orderByDesc("time"));
+    public Page getAllNotePage(@RequestBody SearchDTO<String> searchDTO){
+        String searchStr="%"+searchDTO.getSearchData()+"%";
+        return noteService.getBaseMapper().selectPage(searchDTO,new QueryWrapper<Note>()
+                .or().like("title",searchStr).or().like("content",searchStr).orderByDesc("time"));
+    }
+    @GetMapping("/createByCmd")
+    public String create(@RequestParam String content){
+        Note note=new Note();
+        note.setFormat("cmd");
+        note.setTime(LocalDateTime.now());
+        note.setContent(content);
+        noteService.saveOrUpdate(note);
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy年MM月dd日hh点mm分ss秒");
+        return note.getTime().toString()+"创建成功";
     }
 
     @PostMapping("update")
     public Note update(@RequestBody Note note){
-        noteService.updateById(note);
+        if (note.getId()==null){
+            note.setFormat("html");
+            note.setTime(LocalDateTime.now());
+        }
+        noteService.saveOrUpdate(note);
         return note;
     }
     @PostMapping("delete")

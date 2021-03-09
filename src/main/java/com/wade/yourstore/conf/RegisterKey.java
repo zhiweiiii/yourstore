@@ -23,9 +23,12 @@ public class RegisterKey implements ServletContextAware{
     @Autowired
     KeyInfoServiceImpl keyInfoService;
     @Autowired
-    JavaSocketConnect javaSocketConnect;
+    FileWatchedService fileWatchedService;
+    @Autowired
+    InitDb initDb;
 
     private void registerKeyBy() throws NativeHookException, NoSuchFieldException, IllegalAccessException {
+        initDb.initDate();
         List<KeyInfo> keyInfoList=keyInfoService.getBaseMapper().selectList(new QueryWrapper<>());
         //注册监听
         GlobalScreen.registerNativeHook();
@@ -38,8 +41,18 @@ public class RegisterKey implements ServletContextAware{
     @Override
     public void setServletContext(ServletContext servletContext) {
         registerKeyBy();
-        javaSocketConnect.listenerJavaInput();
+        new Thread(() -> {
+            try {
+                fileWatchedService.watch();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }).start();
+
+
     }
+
 
 
 
